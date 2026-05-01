@@ -160,8 +160,28 @@ Generates:
 
 ## Current conclusions
 
-1. SRWN recurrence is functionally meaningful on the synthetic parity test.
-2. SRWN can reduce its own compute with confidence-based adaptive halting.
-3. On Fashion-MNIST, SRWN variants remain substantially cheaper than CNN in MACs.
-4. In the current v2 deeper/wider sweep, no SRWN variant beats CNN on both accuracy and MACs simultaneously.
-5. Wider SRWN variants improve accuracy most in the tested set, but still trail CNN accuracy.
+### Proven (high confidence)
+
+1. **SRWN recurrence refines early columns on synthetic parity**: Recurrent early-column accuracy improves by ~48% across waves (col0: 0.5186→1.0), while ablated SRWN stays flat (col0: 0.5186→0.5186). This validates the core recurrent mechanism works as intended on parity (but see caveats below).
+2. **Adaptive halting reduces SRWN compute**: Confidence-threshold halting cut SRWN compute by 68% on parity (21216→6745 MACs) and 13% on Fashion-MNIST (83904→72678 MACs) with minimal accuracy loss. This demonstrates anytime inference is viable when inputs have mixed difficulty.
+3. **SRWN is 6-18x cheaper than CNN in MACs**: Across all Fashion-MNIST experiments, SRWN variants ranged 66k-202k MACs vs CNN's 1.22M MACs. This is a real efficiency advantage. However, MACs are analytical counts; actual wall-clock latency requires hardware profiling.
+4. **Wider SRWN > Deeper SRWN for accuracy**: In the v2 sweep, hidden_dim scaling improved accuracy more (+2.4% from 24→48) than row scaling (+1% from 3→5 rows). This guides future hyperparameter searches toward width before depth.
+
+### Unproven (limitations, caveats)
+
+5. **SRWN does not beat CNN on both accuracy and compute**: Best tested SRWN accuracy (0.8532 on Fashion-MNIST v2) trails CNN (0.8700). SRWN is cheaper but less accurate. The experiment doesn't show when SRWN would be preferable—only a compute-accuracy tradeoff, not a dominant design. See [outputs/results.md](outputs/results.md#comprehensive-conclusions) for detailed per-experiment strength/weakness analysis.
+
+6. **Parity is too clean to validate real inference**: XOR and 3-bit parity are noise-free, nondeterministic tasks. The recurrence mechanism that works on parity may not transfer to noisy images or ambiguous labels. Early conclusions (Exp 1-2) should be weighted lightly when considering image benchmarks.
+
+7. **CNN baselines are weak**: All CNN comparisons use a simple 2-layer CNN (reaching 0.87 on Fashion-MNIST). Modern architectures (ResNet, EfficientNet, Vision Transformer) reach 95%+ on the same task. "SRWN is cheaper than a weak CNN" is different from "SRWN is cheaper than a competitive CNN."
+
+8. **Delta convergence criterion fails**: SRWN was designed to refine toward a fixed point, but delta (wave-to-wave refinement magnitude) stays high (~2.0) rather than decaying. This suggests SRWN may not be converging to an attractor. The theory expects convergence; the data doesn't show it.
+
+### Recommended next steps
+
+- **Validate wall-clock latency**: Profile SRWN and CNN on GPU/TPU to see if lower MACs translates to lower latency. Grid ops might not parallelize as well as convolutions.
+- **Test halting on high variance inputs**: Current halting tests use uniform-difficulty datasets (parity, Fashion-MNIST). Test on datasets with easy and hard samples to measure the true efficiency gain.
+- **Run to convergence, not fixed epochs**: Experiments ran 6-8 epochs. Run both SRWN and CNN to same validation loss threshold to see final accuracy gaps without artificial epoch limits.
+- **Explore 1D recurrence**: Test whether a simpler 1D recurrent chain (depth only) would achieve 80% of SRWN's benefit at lower cost. The 2D grid topology is assumed, not validated as optimal.
+
+Full detailed analysis with plot interpretations: [outputs/results.md](outputs/results.md#comprehensive-conclusions)
