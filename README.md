@@ -7,6 +7,7 @@ Systolic Recurrent Wave Network (SRWN) is a grid-based recurrent model aimed at 
 - `srwn_experiment.py`: parity ablation (recurrent vs ablated SRWN)
 - `srwn_benchmark.py`: parity benchmark with MLP baseline and plots
 - `fashion_mnist_benchmark.py`: Fashion-MNIST benchmark with CNN baseline and plots
+- `fashion_mnist_v2.py` and `fashion-mnist-v2.py`: deeper/wider SRWN sweep against CNN baseline
 - `design.md`: architecture assumptions and validation criteria
 - `experiments.md`: experiment plan and rationale
 - `outputs/results.md`: consolidated analysis report
@@ -32,7 +33,7 @@ Latest key outcomes:
 
 ### 3) Fashion-MNIST comparison (SRWN vs CNN)
 
-Latest run produced:
+Latest baseline run produced:
 
 - SRWN fixed test accuracy: 0.8298
 - SRWN adaptive test accuracy: 0.8212
@@ -46,6 +47,20 @@ Interpretation:
 - CNN currently wins on accuracy.
 - SRWN currently wins on compute cost.
 - This is a clear compute-accuracy tradeoff rather than a dominance result.
+
+### 4) Fashion-MNIST v2 (deeper and wider SRWN)
+
+Latest v2 sweep produced:
+
+- CNN test accuracy: 0.8700
+- Best SRWN accuracy: 0.8532 (wider_r3_h48_w3)
+- SRWN adaptive MACs range: 65826.89 to 202217.24
+- CNN MACs/sample: 1218048.00
+
+Crossover answer:
+
+- In this tested v2 sweep, no SRWN variant beat CNN on both accuracy and MACs at the same time.
+- SRWN remained much cheaper; CNN remained more accurate.
 
 ## Compute metric: MACs
 
@@ -128,9 +143,25 @@ Generates:
 - `outputs/fashion_val_accuracy.png`
 - `outputs/fashion_accuracy_vs_compute.png`
 
+### D) Fashion-MNIST v2 deeper/wider sweep
+
+```bash
+D:/apps/Python39/python.exe fashion-mnist-v2.py --out-dir outputs --epochs 8
+```
+
+Generates:
+
+- `outputs/fashion_v2_metrics.json`
+- `outputs/fashion_v2_verdict.json`
+- `outputs/fashion_v2_results.md`
+- `outputs/fashion_v2_accuracy_bar.png`
+- `outputs/fashion_v2_compute_bar.png`
+- `outputs/fashion_v2_acc_vs_macs.png`
+
 ## Current conclusions
 
 1. SRWN recurrence is functionally meaningful on the synthetic parity test.
 2. SRWN can reduce its own compute with confidence-based adaptive halting.
-3. On Fashion-MNIST, current SRWN configuration is compute-efficient but less accurate than a conventional CNN baseline.
-4. The next optimization target is to improve SRWN Fashion-MNIST accuracy while preserving its compute advantage.
+3. On Fashion-MNIST, SRWN variants remain substantially cheaper than CNN in MACs.
+4. In the current v2 deeper/wider sweep, no SRWN variant beats CNN on both accuracy and MACs simultaneously.
+5. Wider SRWN variants improve accuracy most in the tested set, but still trail CNN accuracy.

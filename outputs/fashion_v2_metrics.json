@@ -1,0 +1,278 @@
+{
+  "config": {
+    "out_dir": "outputs",
+    "data_dir": "outputs/fashion_data",
+    "epochs": 8,
+    "batch_size": 128,
+    "train_size": 12000,
+    "val_size": 2000,
+    "test_size": 5000,
+    "learning_rate": 0.001,
+    "conf_threshold": 0.9,
+    "seed": 7,
+    "device": "cuda"
+  },
+  "cnn": {
+    "history": {
+      "train_loss": [
+        0.808462530057481,
+        0.47961986857525846,
+        0.40405620269952935,
+        0.3631907451025983,
+        0.33426299532677267,
+        0.3097316305688087,
+        0.2830251569443561,
+        0.2755879942089953
+      ],
+      "val_acc": [
+        0.8125,
+        0.8385,
+        0.854,
+        0.8655,
+        0.868,
+        0.874,
+        0.8685,
+        0.873
+      ]
+    },
+    "test": {
+      "test_accuracy": 0.87
+    },
+    "params": 206922,
+    "compute": {
+      "fixed_eval_macs": 1218048.0
+    }
+  },
+  "srwn": [
+    {
+      "name": "baseline_r3_h24_w3",
+      "family": "baseline",
+      "config": {
+        "rows": 3,
+        "cols": 4,
+        "hidden_dim": 24,
+        "train_waves": 3,
+        "eval_waves": 3,
+        "learning_rate": 0.001,
+        "epochs": 8
+      },
+      "history": {
+        "train_loss": [
+          1.5186690827633471,
+          0.8939974942105882,
+          0.7023123325185573,
+          0.6108425633704408,
+          0.5606141908371702,
+          0.5304311060525001,
+          0.4925717869971661,
+          0.4741892028362193
+        ],
+        "val_acc": [
+          0.718,
+          0.775,
+          0.791,
+          0.8005,
+          0.8135,
+          0.832,
+          0.8385,
+          0.844
+        ]
+      },
+      "test": {
+        "rightmost_test_accuracy": 0.8328,
+        "halted_test_accuracy": 0.8258,
+        "mean_halt_wave": 2.1668
+      },
+      "params": 40936,
+      "compute": {
+        "fixed_eval_macs": 83904.0,
+        "adaptive_estimated_macs": 65826.89,
+        "per_wave_macs": 21696.0
+      }
+    },
+    {
+      "name": "deeper_r4_h24_w4",
+      "family": "deeper",
+      "config": {
+        "rows": 4,
+        "cols": 4,
+        "hidden_dim": 24,
+        "train_waves": 4,
+        "eval_waves": 4,
+        "learning_rate": 0.001,
+        "epochs": 8
+      },
+      "history": {
+        "train_loss": [
+          1.5238544928266646,
+          0.8177396769219256,
+          0.640786163667415,
+          0.5569219047084768,
+          0.5135827660560608,
+          0.48335825033644414,
+          0.4567647205388292,
+          0.4368207033010239
+        ],
+        "val_acc": [
+          0.738,
+          0.812,
+          0.8155,
+          0.8185,
+          0.836,
+          0.8265,
+          0.8445,
+          0.8525
+        ]
+      },
+      "test": {
+        "rightmost_test_accuracy": 0.8366,
+        "halted_test_accuracy": 0.839,
+        "mean_halt_wave": 2.753
+      },
+      "params": 47944,
+      "compute": {
+        "fixed_eval_macs": 133248.0,
+        "adaptive_estimated_macs": 97573.82,
+        "per_wave_macs": 28608.0
+      }
+    },
+    {
+      "name": "deeper_r5_h24_w4",
+      "family": "deeper",
+      "config": {
+        "rows": 5,
+        "cols": 4,
+        "hidden_dim": 24,
+        "train_waves": 4,
+        "eval_waves": 4,
+        "learning_rate": 0.001,
+        "epochs": 8
+      },
+      "history": {
+        "train_loss": [
+          1.6085144230659971,
+          0.9702613423479364,
+          0.7370725832086928,
+          0.6212856579334178,
+          0.554283211205868,
+          0.5166047998565308,
+          0.4815338783441706,
+          0.45785863412187455
+        ],
+        "val_acc": [
+          0.7055,
+          0.7665,
+          0.797,
+          0.8045,
+          0.8255,
+          0.8415,
+          0.836,
+          0.839
+        ]
+      },
+      "test": {
+        "rightmost_test_accuracy": 0.8256,
+        "halted_test_accuracy": 0.8274,
+        "mean_halt_wave": 3.1848
+      },
+      "params": 54952,
+      "compute": {
+        "fixed_eval_macs": 160896.0,
+        "adaptive_estimated_macs": 131940.1,
+        "per_wave_macs": 35520.0
+      }
+    },
+    {
+      "name": "wider_r3_h32_w3",
+      "family": "wider",
+      "config": {
+        "rows": 3,
+        "cols": 4,
+        "hidden_dim": 32,
+        "train_waves": 3,
+        "eval_waves": 3,
+        "learning_rate": 0.001,
+        "epochs": 8
+      },
+      "history": {
+        "train_loss": [
+          1.3709946788371878,
+          0.7286266944509872,
+          0.5836461078613362,
+          0.518609752680393,
+          0.4803416503870741,
+          0.4536008869713925,
+          0.43607527873617535,
+          0.41296833595062826
+        ],
+        "val_acc": [
+          0.752,
+          0.791,
+          0.8105,
+          0.821,
+          0.835,
+          0.844,
+          0.832,
+          0.8535
+        ]
+      },
+      "test": {
+        "rightmost_test_accuracy": 0.8424,
+        "halted_test_accuracy": 0.8398,
+        "mean_halt_wave": 2.0462
+      },
+      "params": 63784,
+      "compute": {
+        "fixed_eval_macs": 139520.0,
+        "adaptive_estimated_macs": 103138.25,
+        "per_wave_macs": 38144.0
+      }
+    },
+    {
+      "name": "wider_r3_h48_w3",
+      "family": "wider",
+      "config": {
+        "rows": 3,
+        "cols": 4,
+        "hidden_dim": 48,
+        "train_waves": 3,
+        "eval_waves": 3,
+        "learning_rate": 0.001,
+        "epochs": 8
+      },
+      "history": {
+        "train_loss": [
+          1.1880603977974424,
+          0.6416637104876498,
+          0.5416969295511854,
+          0.5005764726628649,
+          0.45499521462207143,
+          0.42640902165402755,
+          0.40857957683979196,
+          0.3953744280845561
+        ],
+        "val_acc": [
+          0.764,
+          0.816,
+          0.8295,
+          0.8245,
+          0.849,
+          0.8355,
+          0.8545,
+          0.8575
+        ]
+      },
+      "test": {
+        "rightmost_test_accuracy": 0.8532,
+        "halted_test_accuracy": 0.8452,
+        "mean_halt_wave": 1.9394
+      },
+      "params": 123304,
+      "compute": {
+        "fixed_eval_macs": 292224.0,
+        "adaptive_estimated_macs": 202217.24,
+        "per_wave_macs": 84864.0
+      }
+    }
+  ]
+}

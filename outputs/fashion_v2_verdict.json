@@ -1,0 +1,99 @@
+{
+  "cnn": {
+    "test_accuracy": 0.87,
+    "macs": 1218048.0
+  },
+  "beats_cnn_on_accuracy_and_macs": [],
+  "best_srwn_accuracy": {
+    "name": "wider_r3_h48_w3",
+    "family": "wider",
+    "config": {
+      "rows": 3,
+      "cols": 4,
+      "hidden_dim": 48,
+      "train_waves": 3,
+      "eval_waves": 3,
+      "learning_rate": 0.001,
+      "epochs": 8
+    },
+    "history": {
+      "train_loss": [
+        1.1880603977974424,
+        0.6416637104876498,
+        0.5416969295511854,
+        0.5005764726628649,
+        0.45499521462207143,
+        0.42640902165402755,
+        0.40857957683979196,
+        0.3953744280845561
+      ],
+      "val_acc": [
+        0.764,
+        0.816,
+        0.8295,
+        0.8245,
+        0.849,
+        0.8355,
+        0.8545,
+        0.8575
+      ]
+    },
+    "test": {
+      "rightmost_test_accuracy": 0.8532,
+      "halted_test_accuracy": 0.8452,
+      "mean_halt_wave": 1.9394
+    },
+    "params": 123304,
+    "compute": {
+      "fixed_eval_macs": 292224.0,
+      "adaptive_estimated_macs": 202217.24,
+      "per_wave_macs": 84864.0
+    }
+  },
+  "best_srwn_efficiency": {
+    "name": "baseline_r3_h24_w3",
+    "family": "baseline",
+    "config": {
+      "rows": 3,
+      "cols": 4,
+      "hidden_dim": 24,
+      "train_waves": 3,
+      "eval_waves": 3,
+      "learning_rate": 0.001,
+      "epochs": 8
+    },
+    "history": {
+      "train_loss": [
+        1.5186690827633471,
+        0.8939974942105882,
+        0.7023123325185573,
+        0.6108425633704408,
+        0.5606141908371702,
+        0.5304311060525001,
+        0.4925717869971661,
+        0.4741892028362193
+      ],
+      "val_acc": [
+        0.718,
+        0.775,
+        0.791,
+        0.8005,
+        0.8135,
+        0.832,
+        0.8385,
+        0.844
+      ]
+    },
+    "test": {
+      "rightmost_test_accuracy": 0.8328,
+      "halted_test_accuracy": 0.8258,
+      "mean_halt_wave": 2.1668
+    },
+    "params": 40936,
+    "compute": {
+      "fixed_eval_macs": 83904.0,
+      "adaptive_estimated_macs": 65826.89,
+      "per_wave_macs": 21696.0
+    }
+  }
+}

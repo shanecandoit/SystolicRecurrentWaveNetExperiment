@@ -182,6 +182,67 @@ Source: outputs/fashion_metrics.json and outputs/fashion_results.md.
 
 On this setup, SRWN does not beat CNN in accuracy yet, but it achieves much lower compute cost. The immediate next step is to tune SRWN (hidden size, waves, and column layout) to recover part of the accuracy gap while staying below CNN compute.
 
+## Fashion-MNIST v2 (deeper and wider SRWN sweep)
+
+### What was run
+
+Command:
+
+```bash
+D:/apps/Python39/python.exe fashion-mnist-v2.py --out-dir outputs --epochs 8
+```
+
+Artifacts:
+
+- outputs/fashion_v2_metrics.json
+- outputs/fashion_v2_verdict.json
+- outputs/fashion_v2_results.md
+- outputs/fashion_v2_accuracy_bar.png
+- outputs/fashion_v2_compute_bar.png
+- outputs/fashion_v2_acc_vs_macs.png
+
+### SRWN variants vs CNN baseline
+
+| Variant | Family | Rows | Hidden dim | Eval waves | Test acc | Adaptive MACs/sample |
+|---|---|---:|---:|---:|---:|---:|
+| baseline_r3_h24_w3 | baseline | 3 | 24 | 3 | 0.8328 | 65826.89 |
+| deeper_r4_h24_w4 | deeper | 4 | 24 | 4 | 0.8366 | 97573.82 |
+| deeper_r5_h24_w4 | deeper | 5 | 24 | 4 | 0.8256 | 131940.10 |
+| wider_r3_h32_w3 | wider | 3 | 32 | 3 | 0.8424 | 103138.25 |
+| wider_r3_h48_w3 | wider | 3 | 48 | 3 | 0.8532 | 202217.24 |
+| cnn_baseline | cnn | - | - | - | 0.8700 | 1218048.00 |
+
+### When do we beat CNN on both accuracy and MACs?
+
+Short answer from this v2 sweep: no tested SRWN variant beat CNN on both metrics simultaneously.
+
+- Best SRWN accuracy: wider_r3_h48_w3 at 0.8532 (still below CNN at 0.8700)
+- All SRWN variants remained far below CNN compute (about 6x to 18x cheaper)
+
+### Plot summaries (v2)
+
+#### 1. outputs/fashion_v2_accuracy_bar.png
+
+- Accuracy generally improved when SRWN was widened.
+- The best bar among SRWN variants was wider_r3_h48_w3.
+- CNN baseline remained the highest-accuracy model in this run.
+
+#### 2. outputs/fashion_v2_compute_bar.png
+
+- CNN has by far the largest compute budget.
+- Wider and deeper SRWN variants increase compute as expected.
+- Even the heaviest SRWN variant stayed well below CNN MACs.
+
+#### 3. outputs/fashion_v2_acc_vs_macs.png
+
+- SRWN points form a lower-compute, lower-accuracy cluster.
+- CNN sits at higher accuracy but much higher compute.
+- No SRWN point crosses above CNN in accuracy while staying below it in compute.
+
+### v2 conclusion
+
+Deeper and wider SRWN variants improved Fashion-MNIST accuracy, especially wider models, but none closed the full gap to CNN. The current frontier is still: SRWN for lower compute, CNN for higher accuracy.
+
 ## Fashion-MNIST SRWN Hyperparameter Sweep (small)
 
 ### Sweep setup
