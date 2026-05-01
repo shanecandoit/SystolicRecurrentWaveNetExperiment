@@ -304,10 +304,49 @@ def evaluate_findings(results):
     return findings
 
 
+def expectation_summary(results):
+    rec = results["recurrent"]
+    abl = results["ablated"]
+
+    rec_col0_gain = rec["accuracy_grid"][-1][0] - rec["accuracy_grid"][0][0]
+    rec_col1_gain = rec["accuracy_grid"][-1][1] - rec["accuracy_grid"][0][1]
+    abl_col0_gain = abl["accuracy_grid"][-1][0] - abl["accuracy_grid"][0][0]
+    abl_col1_gain = abl["accuracy_grid"][-1][1] - abl["accuracy_grid"][0][1]
+
+    recurrent_improves = rec_col0_gain > 0.10 and rec_col1_gain > 0.10
+    ablated_flat = abs(abl_col0_gain) < 0.02 and abs(abl_col1_gain) < 0.02
+    rightmost_strong = rec["accuracy_grid"][-1][-1] > 0.95
+    convergence_supported = rec["delta_mean_by_wave"][3] < 0.5 * rec["delta_mean_by_wave"][1]
+
+    return {
+        "recurrent_improves_early_columns": {
+            "expected": "large early-column gains with recurrence",
+            "observed": f"col0 gain={rec_col0_gain:.4f}, col1 gain={rec_col1_gain:.4f}",
+            "pass": recurrent_improves,
+        },
+        "ablated_stays_flat": {
+            "expected": "little or no early-column gain without recurrence",
+            "observed": f"col0 gain={abl_col0_gain:.4f}, col1 gain={abl_col1_gain:.4f}",
+            "pass": ablated_flat,
+        },
+        "rightmost_final_accuracy": {
+            "expected": "rightmost final accuracy above 0.95",
+            "observed": f"{rec['accuracy_grid'][-1][-1]:.4f}",
+            "pass": rightmost_strong,
+        },
+        "delta_convergence_signal": {
+            "expected": "delta should shrink across later waves",
+            "observed": f"wave2={rec['delta_mean_by_wave'][1]:.4f}, wave4={rec['delta_mean_by_wave'][3]:.4f}",
+            "pass": convergence_supported,
+        },
+    }
+
+
 def render_results_markdown(results, run_command):
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     config = results["config"]
     findings = evaluate_findings(results)
+    expectations = expectation_summary(results)
 
     lines = [
         "# SRWN Experiment Results",
@@ -363,6 +402,26 @@ def render_results_markdown(results, run_command):
         f"| Vertical monotonicity | {results['recurrent']['monotonicity']['vertical']:.4f} | {results['ablated']['monotonicity']['vertical']:.4f} |",
         f"| Halt mean wave | {results['recurrent']['halting']['mean_wave']:.4f} | {results['ablated']['halting']['mean_wave']:.4f} |",
         f"| Halted-policy accuracy | {results['recurrent']['halting']['halted_accuracy']:.4f} | {results['ablated']['halting']['halted_accuracy']:.4f} |",
+        "",
+        "## Expected vs Observed",
+        "",
+        "| Check | Expected | Observed | Status |",
+        "|---|---|---|---|",
+    ])
+
+    for key, value in expectations.items():
+        label = key.replace("_", " ")
+        status = "PASS" if value["pass"] else "FAIL"
+        lines.append(f"| {label} | {value['expected']} | {value['observed']} | {status} |")
+
+    lines.extend([
+        "",
+        "## How To Interpret",
+        "",
+        "1. If recurrent early-column gains are high while ablated gains are near zero, the recurrent wave path is contributing meaningful refinement.",
+        "2. If rightmost final accuracy is high but delta convergence fails, classification works but fixed-point convergence is not yet validated.",
+        "3. Halted-policy accuracy close to rightmost final accuracy means confidence-threshold exit is viable on this task.",
+        "4. For direct comparison against a conventional MLP baseline, read outputs/benchmark_results.md.",
         "",
         "## Evaluation",
         "",

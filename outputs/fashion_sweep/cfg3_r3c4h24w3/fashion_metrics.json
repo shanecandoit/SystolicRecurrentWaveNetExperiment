@@ -1,0 +1,69 @@
+{
+  "config": {
+    "seed": 7,
+    "data_dir": "outputs/fashion_data",
+    "epochs": 4,
+    "batch_size": 128,
+    "train_size": 8000,
+    "val_size": 1500,
+    "test_size": 3000,
+    "rows": 3,
+    "cols": 4,
+    "hidden_dim": 24,
+    "train_waves": 3,
+    "eval_waves": 3,
+    "learning_rate": 0.001,
+    "conf_threshold": 0.9,
+    "device": "cuda"
+  },
+  "srwn": {
+    "history": {
+      "train_loss": [
+        1.7383240669492692,
+        1.0982557383794633,
+        0.8250129799994211,
+        0.6985302860774691
+      ],
+      "val_acc": [
+        0.674,
+        0.754,
+        0.782,
+        0.8173333333333334
+      ]
+    },
+    "test": {
+      "rightmost_test_accuracy": 0.784,
+      "halted_test_accuracy": 0.7803,
+      "mean_halt_wave": 3.0
+    },
+    "params": 40936,
+    "compute": {
+      "fixed_eval_macs": 83904.0,
+      "adaptive_estimated_macs": 83904.0,
+      "per_wave_macs": 21696.0
+    }
+  },
+  "cnn": {
+    "history": {
+      "train_loss": [
+        0.9826678567462497,
+        0.561553135277733,
+        0.4782501719300709,
+        0.432422632735873
+      ],
+      "val_acc": [
+        0.8033333333333333,
+        0.8053333333333333,
+        0.8493333333333334,
+        0.8586666666666667
+      ]
+    },
+    "test": {
+      "test_accuracy": 0.8423
+    },
+    "params": 206922,
+    "compute": {
+      "fixed_eval_macs": 1218048.0
+    }
+  }
+}
