@@ -21,19 +21,21 @@ def set_seed(seed: int) -> None:
 
 
 class GridCell(nn.Module):
-    def __init__(self, hidden_dim: int):
+    def __init__(self, hidden_dim: int, dropout_rate: float = 0.0):
         super().__init__()
         self.top = nn.Linear(hidden_dim, hidden_dim, bias=False)
         self.left = nn.Linear(hidden_dim, hidden_dim, bias=False)
         self.right = nn.Linear(hidden_dim, hidden_dim, bias=False)
         self.bias = nn.Parameter(torch.zeros(hidden_dim))
+        self.dropout = nn.Dropout(dropout_rate)
 
     def forward(self, h_top, h_left, h_right):
-        return torch.tanh(self.top(h_top) + self.left(h_left) + self.right(h_right) + self.bias)
+        out = torch.tanh(self.top(h_top) + self.left(h_left) + self.right(h_right) + self.bias)
+        return self.dropout(out)
 
 
 class SRWNFashion(nn.Module):
-    def __init__(self, rows: int, cols: int, hidden_dim: int, input_dim: int):
+    def __init__(self, rows: int, cols: int, hidden_dim: int, input_dim: int, dropout_rate: float = 0.0):
         super().__init__()
         if input_dim % cols != 0:
             raise ValueError("input_dim must be divisible by cols")
@@ -42,9 +44,10 @@ class SRWNFashion(nn.Module):
         self.cols = cols
         self.hidden_dim = hidden_dim
         self.chunk_dim = input_dim // cols
+        self.dropout_rate = dropout_rate
 
         self.input_layers = nn.ModuleList([nn.Linear(self.chunk_dim, hidden_dim) for _ in range(cols)])
-        self.cells = nn.ModuleList([GridCell(hidden_dim) for _ in range(rows * cols)])
+        self.cells = nn.ModuleList([GridCell(hidden_dim, dropout_rate=dropout_rate) for _ in range(rows * cols)])
         self.heads = nn.ModuleList([nn.Linear(hidden_dim, N_CLASSES) for _ in range(cols)])
 
     def cell(self, row: int, col: int) -> GridCell:
@@ -199,7 +202,13 @@ def eval_cnn(model, loader, device):
 
 
 def train_srwn(config, train_loader, val_loader, device):
-    model = SRWNFashion(config["rows"], config["cols"], config["hidden_dim"], input_dim=28 * 28).to(device)
+    model = SRWNFashion(
+        config["rows"],
+        config["cols"],
+        config["hidden_dim"],
+        input_dim=28 * 28,
+        dropout_rate=config.get("dropout_rate", 0.0),
+    ).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=config["learning_rate"])
 
     wave_weights = torch.linspace(0.5, 1.0, config["train_waves"], device=device)

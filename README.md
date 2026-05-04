@@ -1,143 +1,97 @@
 # Systolic Recurrent Wave Network
 
-This repository evaluates a Systolic Recurrent Wave Network (SRWN) as an anytime model: can iterative wave refinement produce useful predictions early, reduce compute with adaptive halting, and stay competitive with conventional networks?
+This repository evaluates a Systolic Recurrent Wave Network (SRWN) as an anytime model: can iterative wave refinement improve predictions across waves, reduce compute with confidence-based halting, and stay competitive with conventional networks.
 
-## Story in one page
+## Research questions
 
-### Research questions
+1. Does recurrence in SRWN provide measurable refinement?
+2. Does adaptive halting reduce SRWN compute with acceptable accuracy loss?
+3. On Fashion-MNIST, where is the SRWN vs CNN tradeoff frontier?
+4. Can SRWN beat CNN on accuracy, or on both accuracy and compute?
 
-1. Does recurrence in SRWN actually add useful refinement?
-2. Can confidence-based halting reduce SRWN compute without large quality loss?
-3. On image classification, where is the SRWN vs CNN frontier?
-4. Can SRWN beat CNN on both accuracy and compute in the tested budget?
-
-### What was run
+## Experiments run
 
 1. Parity ablation: recurrent SRWN vs ablated SRWN ([srwn_experiment.py](srwn_experiment.py)).
-2. Parity benchmark: SRWN variants vs MLP with plots ([srwn_benchmark.py](srwn_benchmark.py)).
+2. Parity benchmark: SRWN variants vs MLP with training and tradeoff plots ([srwn_benchmark.py](srwn_benchmark.py)).
 3. Fashion-MNIST baseline: SRWN vs 2-layer CNN ([fashion_mnist_benchmark.py](fashion_mnist_benchmark.py)).
-4. Fashion-MNIST v2 sweep: deeper/wider SRWN variants vs CNN ([fashion_mnist_v2.py](fashion_mnist_v2.py), [fashion-mnist-v2.py](fashion-mnist-v2.py)).
+4. Fashion-MNIST v2: deeper and wider SRWN sweep ([fashion_mnist_v2.py](fashion_mnist_v2.py), [fashion-mnist-v2.py](fashion-mnist-v2.py)).
+5. Fashion-MNIST v3: very wide SRWN push (h64→h192) ([fashion_mnist_v3.py](fashion_mnist_v3.py), [fashion-mnist-v3.py](fashion-mnist-v3.py)).
+6. Fashion-MNIST v4: wide SRWN with dropout regularization ([fashion_mnist_v4.py](fashion_mnist_v4.py), [fashion-mnist-v4.py](fashion-mnist-v4.py)).
 
-### Headline findings
+## Current headline findings
 
-1. Recurrence is functionally real on parity: early columns improve with waves in recurrent SRWN and stay flat in ablated SRWN.
-2. Adaptive halting reduces SRWN compute:
-- parity: about 68% reduction (fixed -> adaptive)
-- Fashion-MNIST baseline: about 13% reduction
-3. On Fashion-MNIST, SRWN is much cheaper in MACs but less accurate than the tested CNN.
-4. In the v2 deeper/wider sweep, no tested SRWN variant beats CNN on both accuracy and MACs.
-5. Width improves SRWN accuracy more reliably than depth in the tested range.
+1. Recurrence is functionally real on parity: early columns improve across waves in recurrent SRWN and stay flat in ablated SRWN.
+2. Adaptive halting reduces SRWN compute significantly on parity and moderately on Fashion-MNIST.
+3. v2 showed width is a stronger lever than depth in tested ranges.
+4. v3 showed that even extreme width did not match CNN accuracy and introduced non-monotonic width behavior.
+5. v4 (dropout 0.1) did not beat CNN; best SRWN was 0.8608 vs CNN 0.8906.
 
-## What each experiment shows
+## What each Fashion-MNIST phase shows
 
-### Experiment 1: Parity ablation
+### v2 (deeper/wider)
 
-What it answers:
-- Whether recurrence is doing real work or the network is mostly feed-forward.
+- Showed directionally that width helps more than depth.
+- Did not produce an SRWN variant that beats CNN on both accuracy and MACs.
 
-What it shows:
-- Recurrent early-column gains are large.
-- Ablated early-column gains are near zero.
-- Core recurrence mechanism is validated on synthetic data.
+### v3 (extreme width)
 
-Primary caveat:
-- Delta convergence signal does not show clear decay, so fixed-point convergence remains unproven.
+- Tested whether very wide SRWN can close the accuracy gap.
+- Best SRWN remained below CNN accuracy.
+- At larger widths, SRWN compute crossed CNN compute while still trailing in accuracy.
 
-### Experiment 2: Parity benchmark (with MLP)
+### v4 (dropout regularization)
 
-What it answers:
-- Whether SRWN competitiveness includes compute efficiency, not only accuracy.
+Objective:
+- Test whether dropout p=0.1 stabilizes medium-width SRWN and raises the v3 accuracy ceiling.
 
-What it shows:
-- SRWN recurrent reaches top parity accuracy.
-- Adaptive halting retains quality while lowering SRWN compute.
-- MLP remains substantially cheaper on this synthetic task.
+Result (25 epochs, rows=3, cols=4, waves=3):
+- CNN baseline: 0.8906
+- Best SRWN: 0.8608 (`wide_d01_r3_h96_w3`)
+- Gap to CNN: 0.0298
+- No SRWN variant beat CNN accuracy.
+- Non-monotonic width behavior persisted even with dropout.
 
-Primary caveat:
-- Parity is an unrealistically clean benchmark and weak evidence for image-domain competitiveness.
+Generated artifacts:
+- [outputs/fashion_v4_metrics.json](outputs/fashion_v4_metrics.json)
+- [outputs/fashion_v4_verdict.json](outputs/fashion_v4_verdict.json)
+- [outputs/fashion_v4_results.md](outputs/fashion_v4_results.md)
+- [outputs/fashion_v4_accuracy_bar.png](outputs/fashion_v4_accuracy_bar.png)
+- [outputs/fashion_v4_compute_bar.png](outputs/fashion_v4_compute_bar.png)
+- [outputs/fashion_v4_acc_vs_macs.png](outputs/fashion_v4_acc_vs_macs.png)
 
-### Experiment 3: Fashion-MNIST baseline
+## Inline plot gallery
 
-What it answers:
-- How SRWN compares with a standard CNN on real image data.
+Small inline previews are shown below for quick read-through. Click any image to open full size.
 
-What it shows:
-- CNN wins on accuracy.
-- SRWN wins on compute (MACs).
-- This is a tradeoff frontier, not a dominance result.
+### Parity benchmark
 
-Primary caveat:
-- Short training budget and single SRWN configuration limit conclusions.
+<a href="outputs/train_loss.png"><img src="outputs/train_loss.png" alt="Parity train loss" width="31%"/></a>
+<a href="outputs/val_accuracy.png"><img src="outputs/val_accuracy.png" alt="Parity validation accuracy" width="31%"/></a>
+<a href="outputs/accuracy_vs_compute.png"><img src="outputs/accuracy_vs_compute.png" alt="Parity accuracy vs compute" width="31%"/></a>
 
-### Experiment 4: Fashion-MNIST v2 deeper/wider sweep
+### Fashion baseline
 
-What it answers:
-- Whether depth/width scaling can close the SRWN-CNN gap.
+<a href="outputs/fashion_train_loss.png"><img src="outputs/fashion_train_loss.png" alt="Fashion baseline train loss" width="31%"/></a>
+<a href="outputs/fashion_val_accuracy.png"><img src="outputs/fashion_val_accuracy.png" alt="Fashion baseline validation accuracy" width="31%"/></a>
+<a href="outputs/fashion_accuracy_vs_compute.png"><img src="outputs/fashion_accuracy_vs_compute.png" alt="Fashion baseline accuracy vs compute" width="31%"/></a>
 
-What it shows:
-- Wider SRWN variants improve more than deeper variants.
-- Best tested SRWN remains below CNN accuracy while staying far cheaper.
-- In tested settings, SRWN does not beat CNN on both metrics.
+### Fashion v2 (deeper and wider)
 
-Primary caveat:
-- Search is not exhaustive (rows/cols/waves/lr space remains broad).
+<a href="outputs/fashion_v2_accuracy_bar.png"><img src="outputs/fashion_v2_accuracy_bar.png" alt="Fashion v2 accuracy bar" width="31%"/></a>
+<a href="outputs/fashion_v2_compute_bar.png"><img src="outputs/fashion_v2_compute_bar.png" alt="Fashion v2 compute bar" width="31%"/></a>
+<a href="outputs/fashion_v2_acc_vs_macs.png"><img src="outputs/fashion_v2_acc_vs_macs.png" alt="Fashion v2 accuracy vs macs" width="31%"/></a>
 
-## Current conclusions
+### Fashion v3 (extreme width)
 
-### Supported by current evidence
+<a href="outputs/fashion_v3_accuracy_bar.png"><img src="outputs/fashion_v3_accuracy_bar.png" alt="Fashion v3 accuracy bar" width="31%"/></a>
+<a href="outputs/fashion_v3_compute_bar.png"><img src="outputs/fashion_v3_compute_bar.png" alt="Fashion v3 compute bar" width="31%"/></a>
+<a href="outputs/fashion_v3_acc_vs_macs.png"><img src="outputs/fashion_v3_acc_vs_macs.png" alt="Fashion v3 accuracy vs macs" width="31%"/></a>
 
-1. SRWN recurrence is meaningful for refinement on synthetic parity.
-2. Adaptive halting can reduce SRWN compute while preserving most accuracy.
-3. SRWN currently occupies a low-compute, lower-accuracy region relative to tested CNN baselines on Fashion-MNIST.
-4. Width is currently the higher-leverage SRWN scaling axis than depth.
+### Fashion v4 (dropout 0.1)
 
-### Not yet demonstrated
-
-1. SRWN beating CNN on both accuracy and compute in the tested Fashion-MNIST budget.
-2. True fixed-point-like convergence of SRWN wave dynamics.
-3. Wall-clock latency advantage (MAC advantage is analytical, not profiled latency).
-4. Robust halting benefits on highly heterogeneous real-world difficulty distributions.
-
-## Work still required
-
-Priority 1:
-1. Run SRWN and CNN to comparable convergence criteria, not just fixed epochs.
-2. Profile wall-clock latency and memory behavior, not only MACs.
-3. Expand SRWN sweep across columns, waves, and learning rates.
-
-Priority 2:
-1. Add stronger baselines (deeper CNN, lightweight ViT, or efficient conv models).
-2. Add halting analysis by difficulty buckets (easy/medium/hard samples).
-3. Test alternate SRWN topologies (for example, 1D chain or bidirectional recurrence).
-
-Priority 3:
-1. Evaluate on a harder dataset (for example, CIFAR-10) with the same reporting structure.
-2. Optimize a joint metric (accuracy at fixed compute budget) instead of accuracy alone.
-
-## Where to read full evidence
-
-1. Consolidated narrative and plot-backed conclusions: [outputs/results.md](outputs/results.md)
-2. Parity ablation artifacts: [outputs/results.json](outputs/results.json)
-3. Parity benchmark artifacts: [outputs/benchmark_results.md](outputs/benchmark_results.md), [outputs/benchmark_metrics.json](outputs/benchmark_metrics.json)
-4. Fashion baseline artifacts: [outputs/fashion_results.md](outputs/fashion_results.md), [outputs/fashion_metrics.json](outputs/fashion_metrics.json)
-5. Fashion v2 artifacts: [outputs/fashion_v2_results.md](outputs/fashion_v2_results.md), [outputs/fashion_v2_metrics.json](outputs/fashion_v2_metrics.json), [outputs/fashion_v2_verdict.json](outputs/fashion_v2_verdict.json)
-
-## Plot index
-
-1. Parity benchmark plots:
-- [outputs/train_loss.png](outputs/train_loss.png)
-- [outputs/val_accuracy.png](outputs/val_accuracy.png)
-- [outputs/accuracy_vs_compute.png](outputs/accuracy_vs_compute.png)
-
-2. Fashion baseline plots:
-- [outputs/fashion_train_loss.png](outputs/fashion_train_loss.png)
-- [outputs/fashion_val_accuracy.png](outputs/fashion_val_accuracy.png)
-- [outputs/fashion_accuracy_vs_compute.png](outputs/fashion_accuracy_vs_compute.png)
-
-3. Fashion v2 plots:
-- [outputs/fashion_v2_accuracy_bar.png](outputs/fashion_v2_accuracy_bar.png)
-- [outputs/fashion_v2_compute_bar.png](outputs/fashion_v2_compute_bar.png)
-- [outputs/fashion_v2_acc_vs_macs.png](outputs/fashion_v2_acc_vs_macs.png)
+<a href="outputs/fashion_v4_accuracy_bar.png"><img src="outputs/fashion_v4_accuracy_bar.png" alt="Fashion v4 accuracy bar" width="31%"/></a>
+<a href="outputs/fashion_v4_compute_bar.png"><img src="outputs/fashion_v4_compute_bar.png" alt="Fashion v4 compute bar" width="31%"/></a>
+<a href="outputs/fashion_v4_acc_vs_macs.png"><img src="outputs/fashion_v4_acc_vs_macs.png" alt="Fashion v4 accuracy vs macs" width="31%"/></a>
 
 ## Run commands
 
@@ -164,3 +118,19 @@ D:/apps/Python39/python.exe fashion_mnist_benchmark.py --out-dir outputs
 ```bash
 D:/apps/Python39/python.exe fashion-mnist-v2.py --out-dir outputs --epochs 8
 ```
+
+5. Fashion v3 wide push:
+
+```bash
+D:/apps/Python39/python.exe fashion-mnist-v3.py --out-dir outputs --epochs 25
+```
+
+6. Fashion v4 dropout sweep:
+
+```bash
+D:/apps/Python39/python.exe fashion-mnist-v4.py --out-dir outputs --epochs 25 --dropout-rate 0.1
+```
+
+## Full results narrative
+
+See [outputs/results.md](outputs/results.md) for the consolidated cross-experiment story and interpretation.
